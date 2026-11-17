@@ -94,7 +94,7 @@ try {
   // стиль художника
   await click('nav button, aside button', '~Стиль и цвет', 1500);
   await click('.fold-head', null, 1000);
-  for (const name of ['Мо-Фокеев', 'Калатрава', 'Лисицкий', 'Вырезка']) await click('.fold.open .seg button', name, 2600);
+  for (const name of ['Мо-Фокеев', 'Матисс', 'Лисицкий', 'Вырезка']) await click('.fold.open .seg button', name, 2600);
 
   // превью: каталог и карточка в том же стиле
   await click('button', 'Каталог', 2600);
