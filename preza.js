@@ -59,8 +59,14 @@
   }
 
   // кликер шлёт PageDown/PageUp или стрелки; F — во весь экран, B или точка — чёрный экран
+  // музыка стартует с первого нажатия — браузер не даёт играть без него; M — включить/выключить
+  var music = document.getElementById('music'), musicOn = true;
+  music.volume = .45;
+  function playMusic() { if (musicOn && music.paused) music.play().catch(function () {}); }
   addEventListener('keydown', function (e) {
     var k = e.key;
+    if (k === 'm' || k === 'M' || k === 'ь' || k === 'Ь') { musicOn = music.paused; if (musicOn) music.play().catch(function () {}); else music.pause(); return; }
+    playMusic();
     if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; return; }
     if (k === 'F5' || k === 'f' || k === 'F' || k === 'а' || k === 'А') {
       e.preventDefault();
@@ -74,6 +80,7 @@
     else if (k === 'End') go(slides.length - 1);
   });
 
+  addEventListener('click', playMusic);
   var hideT;
   addEventListener('mousemove', function () {
     document.body.classList.add('mouse');
