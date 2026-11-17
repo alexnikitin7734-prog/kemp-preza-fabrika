@@ -66,8 +66,8 @@
   addEventListener('keydown', function (e) {
     var k = e.key;
     if (k === 'm' || k === 'M' || k === 'ь' || k === 'Ь') { musicOn = music.paused; if (musicOn) music.play().catch(function () {}); else music.pause(); return; }
+    if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; if (black.hidden) playMusic(); else music.pause(); return; }
     playMusic();
-    if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; return; }
     if (k === 'F5' || k === 'f' || k === 'F' || k === 'а' || k === 'А') {
       e.preventDefault();
       if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen();
