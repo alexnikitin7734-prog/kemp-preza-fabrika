@@ -1,0 +1,61 @@
+:root { --bg: #f2eee6; --ink: #141414; --soft: #5d5850; --acc: #ffd23a; --lw: 3px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+body { cursor: none; }
+body.mouse { cursor: default; }
+
+.stage { position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--bg); }
+
+.slide { position: absolute; inset: 0; visibility: hidden; }
+.slide.on, .slide.out { visibility: visible; }
+.grid { position: absolute; left: 60px; top: 60px; width: 1800px; height: 960px; display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(8, 1fr); }
+.c { position: relative; padding: 30px 34px; display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
+.c.top { justify-content: flex-start; }
+.c.mid { justify-content: center; }
+.c.a { background: var(--acc); }
+.c.d { background: var(--ink); color: var(--bg); }
+.c.d span, .c.d .k { color: #b9b3a8; }
+
+/* содержимое клеток уезжает влево и возвращается справа */
+.c > * { transition: transform .7s cubic-bezier(.6, 0, .3, 1), opacity .5s ease; }
+.slide:not(.on) .c > * { opacity: 0; transform: translateX(90px); }
+.slide.out .c > * { transform: translateX(-140px); }
+.slide.on .c > * { transition-delay: calc(.35s + var(--i, 0) * 60ms); }
+.c.a, .c.d { transition: clip-path .7s cubic-bezier(.6, 0, .3, 1); clip-path: inset(0 0 0 0); }
+.slide:not(.on) .c.a, .slide:not(.on) .c.d { clip-path: inset(0 100% 0 0); }
+.slide.out .c.a, .slide.out .c.d { clip-path: inset(0 0 0 100%); }
+.slide.on .c.a, .slide.on .c.d { transition-delay: calc(.25s + var(--i, 0) * 60ms); }
+
+/* линии сетки: рисуются, при уходе стираются в другую сторону */
+.ln { position: absolute; background: var(--ink); pointer-events: none; transition: transform .55s cubic-bezier(.6, 0, .3, 1); }
+.ln.h { height: var(--lw); transform-origin: 0 50%; transform: scaleX(0); }
+.ln.v { width: var(--lw); transform-origin: 50% 0; transform: scaleY(0); }
+.slide.on .ln { transform: none; transition-delay: var(--dl); }
+.slide.out .ln.h { transform-origin: 100% 50%; transition-delay: calc(var(--dl) * .4); }
+.slide.out .ln.v { transform-origin: 50% 100%; transition-delay: calc(var(--dl) * .4); }
+
+.k { font-size: 20px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); margin-bottom: 14px; }
+.n { font-size: 30px; font-weight: 800; }
+h1 { font-weight: 900; font-size: 196px; line-height: .86; letter-spacing: -.045em; text-transform: uppercase; white-space: nowrap; }
+h2 { font-weight: 900; font-size: 92px; line-height: .9; letter-spacing: -.035em; text-transform: uppercase; }
+.shift { position: relative; left: 1.1em; }
+p, li { font-size: 28px; line-height: 1.3; }
+.lead { font-size: 36px; line-height: 1.22; font-weight: 500; }
+b { font-weight: 800; }
+.big { font-weight: 900; font-size: 120px; line-height: .9; letter-spacing: -.04em; }
+.mid-n { font-weight: 900; font-size: 64px; line-height: 1; letter-spacing: -.03em; }
+.small { font-size: 22px; line-height: 1.3; color: var(--soft); }
+.c.d .small { color: #b9b3a8; }
+a { color: inherit; text-decoration-thickness: 3px; text-underline-offset: 6px; }
+ul { list-style: none; }
+li + li { margin-top: 10px; }
+.todo { background: repeating-linear-gradient(-45deg, transparent 0 8px, rgba(20, 20, 20, .09) 8px 16px); outline: 2px dashed var(--ink); outline-offset: 4px; padding: 0 6px; font-style: normal; }
+.shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.c.pic { padding: 0; overflow: hidden; }
+.c.pic > img { transition: transform .9s cubic-bezier(.6, 0, .3, 1), opacity .6s ease; }
+
+.pager { position: absolute; right: 60px; bottom: 18px; display: flex; gap: 8px; }
+.pager i { width: 26px; height: 6px; background: rgba(20, 20, 20, .18); }
+.pager i.on { background: var(--ink); }
+.black { position: fixed; inset: 0; background: #000; z-index: 10; }
+.still *, .still .c > * { transition: none !important; }
