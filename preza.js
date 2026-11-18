@@ -58,29 +58,46 @@
     history.replaceState(null, '', '#' + (i + 1));
   }
 
+  // слайд 1: первое «вперёд» запускает голос Claude (браузер не даёт играть без нажатия), следующее — уже слайд 2.
+  // V — сказать заново
+  var voice = document.getElementById('voice'), C = window.CLAUDE, said = false, raf;
+  var say = document.getElementById('say'), bars = document.querySelectorAll('#claude .bars i');
+  function talk() {
+    said = true; voice.currentTime = 0; voice.play().catch(function () {});
+    say.textContent = ''; document.body.classList.add('talk');
+    cancelAnimationFrame(raf); tick();
+  }
+  function hush() { voice.pause(); document.body.classList.remove('talk'); cancelAnimationFrame(raf); }
+  function tick() {
+    var t = voice.currentTime, f = Math.floor(t * C.fps);
+    C.cues.forEach(function (c) { if (t >= c.t && say.textContent !== c.text) say.textContent = c.text; });
+    // полоски — громкость чуть разных моментов, чтобы качались волной, а не хором
+    [].forEach.call(bars, function (b, k) { b.style.transform = 'scaleY(' + Math.max(.08, Math.sqrt(C.env[f - Math.abs(k - 3)] || 0)) + ')'; });
+    raf = requestAnimationFrame(tick);
+  }
+  voice.addEventListener('ended', hush);
+
   // кликер шлёт PageDown/PageUp или стрелки; F — во весь экран, B или точка — чёрный экран
-  // музыка стартует с первого нажатия — браузер не даёт играть без него; M — включить/выключить
-  var music = document.getElementById('music'), musicOn = true;
-  music.volume = .45;
-  function playMusic() { if (musicOn && music.paused) music.play().catch(function () {}); }
   addEventListener('keydown', function (e) {
     var k = e.key;
-    if (k === 'm' || k === 'M' || k === 'ь' || k === 'Ь') { musicOn = music.paused; if (musicOn) music.play().catch(function () {}); else music.pause(); return; }
-    if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; if (black.hidden) playMusic(); else music.pause(); return; }
-    playMusic();
+    if (k === 'v' || k === 'V' || k === 'м' || k === 'М') { go(0); talk(); return; }
+    if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; if (!black.hidden) hush(); return; }
     if (k === 'F5' || k === 'f' || k === 'F' || k === 'а' || k === 'А') {
       e.preventDefault();
       if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen();
       return;
     }
     if (!black.hidden) black.hidden = true;
-    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].indexOf(k) >= 0) { e.preventDefault(); go(cur + 1); }
-    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(k) >= 0) { e.preventDefault(); go(cur - 1); }
-    else if (k === 'Home') go(0);
-    else if (k === 'End') go(slides.length - 1);
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].indexOf(k) >= 0) {
+      e.preventDefault();
+      if (cur === 0 && !said) { talk(); return; }
+      hush(); go(cur + 1);
+    }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(k) >= 0) { e.preventDefault(); hush(); go(cur - 1); }
+    else if (k === 'Home') { hush(); go(0); }
+    else if (k === 'End') { hush(); go(slides.length - 1); }
   });
 
-  addEventListener('click', playMusic);
   var hideT;
   addEventListener('mousemove', function () {
     document.body.classList.add('mouse');

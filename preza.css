@@ -59,3 +59,13 @@ li + li { margin-top: 10px; }
 .pager i.on { background: var(--ink); }
 .black { position: fixed; inset: 0; background: #000; z-index: 10; }
 .still *, .still .c > * { transition: none !important; }
+
+/* слайд 1: говорит Claude — клетка команды загорается, полоски качаются по громкости, вместо подзаголовка субтитры */
+.say { display: none; }
+.talk .s1 .lead:not(.say) { display: none; }
+.talk .s1 .say { display: block; }
+.c.claude { transition: background-color .4s ease; }
+.talk .c.claude { background: var(--acc); }
+.bars { position: absolute; right: 34px; top: 30px; height: 64px; display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity .4s ease; }
+.talk .bars { opacity: 1; }
+.bars i { width: 8px; height: 100%; background: var(--ink); transform: scaleY(.08); }
