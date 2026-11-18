@@ -63,7 +63,7 @@
   var voice = document.getElementById('voice'), C = window.CLAUDE, said = false, raf;
   var say = document.getElementById('say'), bars = document.querySelectorAll('#claude .bars i');
   function talk() {
-    said = true; voice.currentTime = 0; voice.play().catch(function () {});
+    music.pause(); said = true; voice.currentTime = 0; voice.play().catch(function () {});
     say.textContent = ''; document.body.classList.add('talk');
     cancelAnimationFrame(raf); tick();
   }
@@ -75,13 +75,19 @@
     [].forEach.call(bars, function (b, k) { b.style.transform = 'scaleY(' + Math.max(.08, Math.sqrt(C.env[f - Math.abs(k - 3)] || 0)) + ')'; });
     raf = requestAnimationFrame(tick);
   }
-  voice.addEventListener('ended', hush);
+  voice.addEventListener('ended', function () { hush(); playMusic(); });
+
+  // наш трек «станок и мелодия» — вступает, когда Claude договорил или ушли со слайда 1; M — включить/выключить
+  var music = document.getElementById('music'), musicOn = true;
+  music.volume = .35;
+  function playMusic() { if (musicOn && said && black.hidden && voice.paused) music.play().catch(function () {}); }
 
   // кликер шлёт PageDown/PageUp или стрелки; F — во весь экран, B или точка — чёрный экран
   addEventListener('keydown', function (e) {
     var k = e.key;
+    if (k === 'm' || k === 'M' || k === 'ь' || k === 'Ь') { musicOn = music.paused; if (musicOn) music.play().catch(function () {}); else music.pause(); return; }
     if (k === 'v' || k === 'V' || k === 'м' || k === 'М') { go(0); talk(); return; }
-    if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; if (!black.hidden) hush(); return; }
+    if (k === 'b' || k === 'B' || k === 'и' || k === 'И' || k === '.' || k === 'ю') { black.hidden = !black.hidden; if (!black.hidden) { hush(); music.pause(); } else playMusic(); return; }
     if (k === 'F5' || k === 'f' || k === 'F' || k === 'а' || k === 'А') {
       e.preventDefault();
       if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen();
@@ -96,6 +102,7 @@
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(k) >= 0) { e.preventDefault(); hush(); go(cur - 1); }
     else if (k === 'Home') { hush(); go(0); }
     else if (k === 'End') { hush(); go(slides.length - 1); }
+    playMusic();
   });
 
   var hideT;
